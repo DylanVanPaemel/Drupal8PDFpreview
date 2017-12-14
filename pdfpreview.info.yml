@@ -1,0 +1,12 @@
+#aanpassen van extentie .info wordt info.yml
+#aanpassen van het bestand zelf : wordt =
+#toevoegen van type (nieuw in drupal 8)
+name: PDF Preview
+type: module
+description: Show a preview of attached PDF-files
+package: Media
+core: 8.x
+configure: pdfpreview.settings
+dependencies:
+  - image
+  - imagemagick
