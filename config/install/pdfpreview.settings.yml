@@ -1,0 +1,7 @@
+quality: 75
+size: '1024x1024'
+path: 'pdfpreview'
+filenames: 'human'
+show_description: FALSE
+tag: 'span'
+fallback_formatter: 'file_default'
