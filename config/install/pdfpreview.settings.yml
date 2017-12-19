@@ -5,3 +5,4 @@ filenames: 'human'
 show_description: FALSE
 tag: 'span'
 fallback_formatter: 'file_default'
+type: 'png'

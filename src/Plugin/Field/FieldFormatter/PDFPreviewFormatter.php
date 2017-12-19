@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains \Drupal\pdfpreview\Plugin\Field\FieldFormatter\PDFPreviewFormatter.
+ */
 
 namespace Drupal\pdfpreview\Plugin\Field\FieldFormatter;
 
@@ -8,11 +12,22 @@ use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
 
-
-//mogelijkheid om het veld te selecteren binnen een contenttype + instellingen
+/**
+ * Plugin implementation of the 'pdfpreview' formatter.
+ *
+ * @FieldFormatter(
+ *   id = "pdfpreview",
+ *   label = @Translation("PDF Preview"),
+ *   field_types = {
+ *     "file"
+ *   }
+ * )
+ */
 class PDFPreviewFormatter extends ImageFormatter {
 
-
+  /**
+   * {@inheritdoc}
+   */
   public static function defaultSettings() {
     $config = \Drupal::config('pdfpreview.settings');
     return array(
@@ -22,7 +37,9 @@ class PDFPreviewFormatter extends ImageFormatter {
     ) + parent::defaultSettings();
   }
 
-
+  /**
+   * {@inheritdoc}
+   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
     $form['show_description'] = array(
@@ -49,7 +66,9 @@ class PDFPreviewFormatter extends ImageFormatter {
     return $form;
   }
 
-
+  /**
+   * {@inheritdoc}
+   */
   public function settingsSummary() {
     $summary = parent::settingsSummary();
     $summary[] = t('Separator tag: @tag', array(
@@ -64,16 +83,21 @@ class PDFPreviewFormatter extends ImageFormatter {
     return $summary;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = array();
     $files = $this->getEntitiesToView($items, $langcode);
 
+    // Early opt-out if the field is empty.
     if (empty($files)) {
       return $elements;
     }
 
     $url = NULL;
     $image_link_setting = $this->getSetting('image_link');
+    // Check if the formatter involves a link.
     if ($image_link_setting == 'content') {
       $entity = $items->getEntity();
       if (!$entity->isNew()) {
@@ -86,6 +110,7 @@ class PDFPreviewFormatter extends ImageFormatter {
 
     $image_style_setting = $this->getSetting('image_style');
 
+    // Collect cache tags to be added for each item in the field.
     $cache_tags = array();
     if (!empty($image_style_setting)) {
       $image_style = $this->imageStyleStorage->load($image_style_setting);
@@ -100,6 +125,9 @@ class PDFPreviewFormatter extends ImageFormatter {
         $cache_contexts[] = 'url.site';
       }
       $cache_tags = Cache::mergeTags($cache_tags, $file->getCacheTags());
+
+      // Extract field item attributes for the theme function, and unset them
+      // from the $item so that the field template does not re-render them.
       $item = $file->_referringItem;
       $item_attributes = $item->_attributes;
       unset($item->_attributes);
@@ -110,7 +138,7 @@ class PDFPreviewFormatter extends ImageFormatter {
       }
       $item_attributes['class'][] = 'pdfpreview-file';
 
-
+      // Separate the PDF previews from the other files.
       $show_preview = FALSE;
       if ($file->getMimeType() == 'application/pdf') {
         $preview_uri = \Drupal::service('pdfpreview.generator')->getPDFPreview($file);
