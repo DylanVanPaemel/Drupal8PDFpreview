@@ -1,0 +1,4 @@
+#nieuw binnen drupal 8, benoemen van de service in apart bestand
+services:
+  pdfpreview.generator:
+    class: Drupal\pdfpreview\PDFPreviewGenerator
